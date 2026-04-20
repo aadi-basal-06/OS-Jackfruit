@@ -17,7 +17,7 @@ ci: $(USER_TARGETS)
 module: monitor.ko
 
 engine: engine.c monitor_ioctl.h
-	gcc -O2 -Wall -Wextra -o engine engine.c -lpthread
+	gcc -O2 -Wall -Wextra -DHAVE_MONITOR -o engine engine.c -lpthread
 
 memory_hog: memory_hog.c
 	gcc -O2 -Wall $(WORKLOAD_LDFLAGS) -o memory_hog memory_hog.c
@@ -36,6 +36,6 @@ clean:
 	rm -f $(USER_TARGETS) *.o *.mod *.mod.c *.symvers *.order
 	rm -f *.log
 	rm -rf logs
-	rm -f /tmp/mini_runtime.sock
+	rm -f /tmp/mini_runtime.sock 2>/dev/null || true
 
 .PHONY: all ci module clean
