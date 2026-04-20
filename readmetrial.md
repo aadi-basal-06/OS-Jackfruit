@@ -7,7 +7,7 @@ A lightweight Linux container runtime in C with a long-running supervisor proces
 ## 1. Team Information
 
 
-Aadi Basal, PES2UG24CS005
+Aadi Basal, PES2UG24CS005 ||
 Abhirup Roy, PES2UG24CS025
 ---
 
