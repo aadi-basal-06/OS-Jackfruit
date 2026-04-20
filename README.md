@@ -142,56 +142,56 @@ sudo dmesg | tail -5
 ## 3. Demo Screenshots
 
 ### Screenshot 1 — Multi-container supervision
-![alt text](image.png)
-![alt text](image-1.png)
+![alt text](i1.jpeg)
+![alt text](i2.jpeg)
 *Two containers (alpha and beta) running simultaneously under one supervisor process. Terminal 1 shows the supervisor output with both `started container` lines. Terminal 2 shows the `start` commands and their responses.*
 
 ---
 
 ### Screenshot 2 — Metadata tracking
-![alt text](image-11.png)
+![alt text](i3.jpeg)
 
 *Output of `sudo ./engine ps` showing both containers in `running` state with their PIDs, start times, and exit codes.*
 
 ---
 
 ### Screenshot 3 — Bounded-buffer logging
-![alt text](image-2.png)
-![alt text](image-3.png)
+![alt text](i4.jpeg)
+![alt text](i5.jpeg)
 *Contents of `logs/alpha.log` captured through the producer-consumer logging pipeline, showing repeated `hello from alpha` lines. `ls -lh logs/` confirms both log files exist with nonzero sizes.*
 
 ---
 
 ### Screenshot 4 — CLI and IPC
-![alt text](image-4.png)
+![alt text](i6.jpeg)
 *The `run` command issued from the CLI client, blocking until the container exits, then printing the supervisor's response. Demonstrates the UNIX domain socket control channel (Path B) between the CLI process and the supervisor daemon.*
 
 ---
 
 ### Screenshot 5 — Soft-limit warning
-![alt text](image-10.png)
+![alt text](i7.jpeg)
 
 *`dmesg` output showing the kernel module emitting a soft-limit warning for container `memtest` when its RSS exceeded 20 MiB. The warning includes the container ID, PID, actual RSS, and configured limit.*
 
 ---
 
 ### Screenshot 6 — Hard-limit enforcement
-![alt text](image-9.png)
+![alt text](i8.jpeg)
 
 *`dmesg` output showing the kernel module sending SIGKILL to `memtest` after its RSS exceeded 40 MiB, followed by `sudo ./engine ps` output showing the container state as `hard_limit_killed` with exit code 137 (128 + SIGKILL).*
 
 ---
 
 ### Screenshot 7 — Scheduling experiment
-![alt text](image-5.png)
-![alt text](image-6.png)
-*Two CPU-bound containers running simultaneously with different nice values (`-5` vs `+10`). The high-priority container (cpu-hi) completed in 14.748s while the low-priority container (cpu-lo) took 16.329s on the same 15-second workload, demonstrating the CFS scheduler allocating more CPU time to the lower-nice process.*
+![alt text](i9.jpeg)
+![alt text](i10.jpeg)
+*Two CPU-bound containers running simultaneously with different nice values (`-5` vs `+10`). The high-priority container (cpu-hi) completed in 16.363s while the low-priority container (cpu-lo) took 22.831s on the same 15-second workload, demonstrating the CFS scheduler allocating more CPU time to the lower-nice process.*
 
 ---
 
 ### Screenshot 8 — Clean teardown
-![alt text](image-7.png)
-![alt text](image-8.png)
+![alt text](i11.jpeg)
+![alt text](i12.jpeg)
 
 *`sudo ./engine ps` showing both containers in `stopped` state after `stop` commands. `ps aux | grep defunct` returns no zombie processes. Terminal 1 shows the supervisor printing `[supervisor] shutting down`, `[logger] consumer thread exiting, flushing done`, and `[supervisor] exited cleanly` on Ctrl+C.*
 
@@ -282,14 +282,14 @@ Both containers ran `/cpu_hog 15` — a pure CPU-bound workload that spins for 1
 
 | Container | Nice value | Priority | Real time (wall clock) |
 |-----------|-----------|----------|----------------------|
-| cpu-hi | -5 | High | 14.748s |
-| cpu-lo | +10 | Low | 16.329s |
+| cpu-hi | -5 | High | 16.363s |
+| cpu-lo | +10 | Low | 22.831s |
 
 Both containers were launched within 1-2 seconds of each other so they competed for CPU time for the majority of their runtime.
 
 **Observations:**
 
-- cpu-hi finished 1.581 seconds faster despite running the same workload.
+- cpu-hi finished 6.468 seconds faster despite running the same workload.
 - Neither task was starved — both completed successfully.
 - The difference (about 10% of total runtime) is consistent with CFS proportional sharing: at nice -5 vs nice +10, the weight ratio is approximately 1.5:1, meaning cpu-hi received roughly 60% of shared CPU time and cpu-lo received 40%.
 
